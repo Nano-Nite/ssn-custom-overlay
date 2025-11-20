@@ -1,167 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat Overlay (Lite)</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Overlay (Lite)</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-<style>
-    @font-face {
-        font-family: 'Arima-Regular';
-        src: url('https://raw.githubusercontent.com/NDISCOVER/Arima-Font/master/fonts/static/ttf/Arima-Regular.ttf')
-         format('truetype');
+    <style>
+      @font-face {
+        font-family: "Arima-Regular";
+        src: url("https://raw.githubusercontent.com/NDISCOVER/Arima-Font/master/fonts/static/ttf/Arima-Regular.ttf")
+          format("truetype");
         font-weight: 300;
         font-style: normal;
         font-size: large;
-    }
+      }
 
-    body,html{
-        margin:0;padding:0;width:auto;height:auto;
-        background:transparent;overflow:hidden;
-        font-family:'Arima-Regular',sans-serif;
-    }
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: auto;
+        height: auto;
+        background: transparent;
+        overflow: hidden;
+        font-family: "Arima-Regular", sans-serif;
+      }
 
-    #chat {
-        position:absolute;
-        left:50%;bottom:0;
-        transform:translateX(-50%);
-        width:100%;max-width:350px;
-        padding:0 20px;
-        box-sizing:border-box;
-    }
+      #chat {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 350px;
+        padding: 0 20px;
+        box-sizing: border-box;
+      }
 
-    .msg {
-        background:#edebeb;
-        /* border:1px solid #2e3b55; */
-        /* border-left:4px solid #4ab8f9; */
-        color:black;
-        padding:12px;
-        margin-bottom:12px;
-        border-radius:12px;
-        opacity:0;
-        transform:translateY(20px);
-        transition:0.45s ease;
-    }
+      .msg.left {
+        margin-left: 0;
+        margin-right: auto;
+        background: #ffffff;
+        color: #000;
+        padding: 10px 14px;
+        margin-bottom: 27px;
+        border-radius: 6px;
+        border-bottom: 4px solid #c7c7c7;
+        border-right: 1px solid #c7c7c7;
+        border-top: 1px solid #c7c7c7;
+        box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: 0.45s ease;
+        width: fit-content;
+        max-width: 320px;
+        position: relative;
+      }
 
-    .msg.visible{
-        opacity:1;
-        transform:translateY(0);
-    }
+      .msg.right {
+        flex-direction: row-reverse;
+        margin-right: 0;
+        margin-left: auto;
+        text-align: right; /* optional, keeps text aligned like chat apps */
+        background: #ffffff;
+        color: #000;
+        padding: 10px 14px;
+        margin-bottom: 27px;
+        border-radius: 6px;
+        border-bottom: 4px solid #2a7bf3;
+        border-right: 1px solid #c7c7c7;
+        border-top: 1px solid #c7c7c7;
+        box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: 0.45s ease;
+        width: fit-content;
+        max-width: 320px;
+        position: relative;
+      }
 
-    .fade-out{
-        opacity:0 !important;
-    }
+      .msg.left::after {
+        content: "";
+        position: absolute;
+        bottom: -14px;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-top: 15px solid #ffffff;
+        border-right: 15px solid transparent;
+        filter: drop-shadow(0px 3px 1px rgba(0, 0, 0, 0.25));
+      }
 
-    .avatar{
-        width:40px;height:40px;
-        border-radius:50%;background-size:cover;
-        margin-right:10px;flex-shrink:0;
-    }
+      .msg.right::after {
+        content: "";
+        position: absolute;
+        bottom: -14px;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-top: 15px solid #ffffff;
+        border-left: 15px solid transparent;
+        filter: drop-shadow(0px 3px 1px rgba(0, 0, 0, 0.25));
+      }
 
-    .row{display:flex;align-items:center;}
-    .name{font-weight:700;font-size:1em;}
-    .text{margin-top:6px;font-size:.9em;line-height:1.4;}
-</style>
-</head>
+      .msg.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-<body>
-<div id="chat"></div>
+      .fade-out {
+        opacity: 0 !important;
+      }
 
-<script>
-const MAX_MESSAGES = 1;
-const chat = document.getElementById("chat");
+      .avatar.left {
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        background-size: cover;
+        margin-right: 10px;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
 
-document.addEventListener("click", () => {
-    const snd = document.getElementById("notifSound");
-    if (snd) snd.play().then(() => snd.pause());
-}, { once: true });
+      .avatar.right {
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        background-size: cover;
+        margin-left: 10px;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
 
+      .row {
+        display: flex;
+        align-items: center;
+      }
 
-function addMessage(d){
-    if(!d.chatname && !d.chatmessage) return;
+      .name {
+        font-weight: 700;
+        font-size: 0.95em;
+        margin-bottom: 2px;
+        color: #1a1a1a;
+      }
 
-    // Play notification audio
-    const snd = document.getElementById("notifSound");
-    if (snd) {
-        snd.volume = 0.3;
-        snd.currentTime = 0;
+      .text {
+        margin-top: 4px;
+        font-size: 0.88em;
+        line-height: 1.4;
+        color: #333;
+      }
 
-        snd.play().catch(err => {
+      .time.left {
+        font-size: 0.72em;
+        color: #777;
+        margin-top: 6px;
+        text-align: right;
+      }
+
+      .time.right {
+        font-size: 0.72em;
+        color: #777;
+        margin-top: 6px;
+        text-align: left;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="chat"></div>
+
+    <script>
+      const MAX_MESSAGES = 1;
+      let count = 0;
+      let messageQueue = [];
+
+      const chat = document.getElementById("chat");
+
+      document.addEventListener(
+        "click",
+        () => {
+          const snd = document.getElementById("notifSound");
+          if (snd) snd.play().then(() => snd.pause());
+        },
+        { once: true }
+      );
+
+      function addMessage(d) {
+        if (!d.chatname && !d.chatmessage) return;
+
+        // Play notification audio
+        const snd = document.getElementById("notifSound");
+        if (snd) {
+          snd.volume = 0.3;
+          snd.currentTime = 0;
+
+          snd.play().catch((err) => {
             console.log("Audio blocked, waiting for user interaction:", err);
+          });
+        }
+
+        const div = document.createElement("div");
+        div.className = "msg";
+
+        const msgs = chat.querySelectorAll(".msg");
+        if (count === 0) {
+          div.classList.add("left");
+          count++;
+        } else {
+          div.classList.add("right");
+          count--;
+        }
+
+        const defaultAvatar =
+          "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+        let avatarURL =
+          d.chatimg && d.chatimg !== "undefined" && d.chatimg !== ""
+            ? d.chatimg
+            : defaultAvatar;
+
+        const avatar = `
+              <div class="avatar"
+                  style="background-image:url('${avatarURL}')"
+                  onerror="this.style.backgroundImage='url(${defaultAvatar})'">
+              </div>
+          `;
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
         });
-    }
 
+        if (count === 0) {
+          const avatar = `
+              <div class="avatar right"
+                  style="background-image:url('${avatarURL}')"
+                  onerror="this.style.backgroundImage='url(${defaultAvatar})'">
+              </div>
+          `;
 
-    const div = document.createElement("div");
-    div.className="msg";
+          div.innerHTML = `
+              <div class="row">
+                  <div>
+                      <div class="name">${d.chatname || ""}</div>
+                      <div class="text">${d.chatmessage || ""}</div>
+                      <div class="time right">${timeStr}</div>
+                  </div>
+                  ${avatar}
+              </div>
+          `;
+        } else {
+          const avatar = `
+              <div class="avatar left"
+                  style="background-image:url('${avatarURL}')"
+                  onerror="this.style.backgroundImage='url(${defaultAvatar})'">
+              </div>
+          `;
 
-    const avatar = d.chatimg
-        ? `<div class="avatar" style="background-image:url('${d.chatimg}')"></div>`
-        : "";
+          div.innerHTML = `
+              <div class="row">
+                  ${avatar}
+                  <div>
+                      <div class="name">${d.chatname || ""}</div>
+                      <div class="text">${d.chatmessage || ""}</div>
+                      <div class="time left">${timeStr}</div>
+                  </div>
+              </div>
+          `;
+        }
 
-    div.innerHTML = `
-        <div class="row">
-            ${avatar}
-            <div class="name">${d.chatname || ""}</div>
-        </div>
-        <div class="text">${d.chatmessage || ""}</div>
-    `;
+        chat.appendChild(div);
 
-    chat.appendChild(div);
+        // trigger animation
+        requestAnimationFrame(() => div.classList.add("visible"));
 
-    // trigger animation
-    requestAnimationFrame(()=>div.classList.add("visible"));
+        // fade out after 10s
+        setTimeout(()=>div.classList.add("fade-out"), 10000);
 
-    // fade out after 25s
-    setTimeout(()=>div.classList.add("fade-out"), 10000);
+        // remove after fade (15s)
+        setTimeout(()=>{
+            if(div.parentNode) div.parentNode.removeChild(div);
+        }, 15000);
 
-    // remove after fade (33s)
-    setTimeout(()=>{
-        if(div.parentNode) div.parentNode.removeChild(div);
-    }, 15000);
+        messageQueue.push(div);
 
-    // Keep message count small
-    const msgs = chat.querySelectorAll(".msg");
-    if(msgs.length > MAX_MESSAGES){
-        // msgs[0].remove();
-        const old = msgs[0];
-        // fade out animation
-        old.classList.add("fade-out");
+        if (messageQueue.length > MAX_MESSAGES) {
+          let old = messageQueue.shift();
+          old.classList.add("fade-out");
 
-        // remove after animation finishes (0.5s)
-        setTimeout(() => {
+          setTimeout(() => {
             if (old.parentNode) old.remove();
-        }, 500);
-    }
-}
+          }, 500);
+        }
+      }
 
-// --- Social Stream Ninja Integration ---
-var urlParams = new URLSearchParams(window.location.search);
-var roomID = urlParams.get("session") || "iWWnKL28tQ";
-var password = "false";
+      // --- Social Stream Ninja Integration ---
+      var urlParams = new URLSearchParams(window.location.search);
+      var roomID = urlParams.get("session") || "iWWnKL28tQ";
+      var password = "false";
 
-var iframe = document.createElement("iframe");
-iframe.src = "https://vdo.socialstream.ninja/?ln&salt=vdo.ninja&password="+password+"&push&label=dock&vd=0&ad=0&novideo&noaudio&autostart&cleanoutput&room="+roomID;
-iframe.style = "width:0;height:0;position:fixed;left:-100px;top:-100px;";
-document.body.appendChild(iframe);
+      var iframe = document.createElement("iframe");
+      iframe.src =
+        "https://vdo.socialstream.ninja/?ln&salt=vdo.ninja&password=" +
+        password +
+        "&push&label=dock&vd=0&ad=0&novideo&noaudio&autostart&cleanoutput&room=" +
+        roomID;
+      iframe.style = "width:0;height:0;position:fixed;left:-100px;top:-100px;";
+      document.body.appendChild(iframe);
 
-window.addEventListener("message", e=>{
-    if(e.source !== iframe.contentWindow) return;
-    const data = e.data?.dataReceived?.overlayNinja;
-    if(data) addMessage(data);
-});
+      window.addEventListener("message", (e) => {
+        if (e.source !== iframe.contentWindow) return;
+        const data = e.data?.dataReceived?.overlayNinja;
+        if (data) addMessage(data);
+      });
 
-// Optional WebSocket listener
-if(urlParams.has("server")){
-    const socket = new WebSocket(urlParams.get("server"));
-    socket.onmessage = e=>{
-        try{ addMessage(JSON.parse(e.data)); }catch{}
-    };
-}
-</script>
-<!-- <audio id="notifSound" src="new-notification-014-363678.mp3" preload="auto"></audio> -->
-<!-- <audio id="notifSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_6ddc926bb4.mp3" preload="auto"></audio> -->
-</body>
+      // Optional WebSocket listener
+      if (urlParams.has("server")) {
+        const socket = new WebSocket(urlParams.get("server"));
+        socket.onmessage = (e) => {
+          try {
+            addMessage(JSON.parse(e.data));
+          } catch {}
+        };
+      }
+    </script>
+    <audio
+      id="notifSound"
+      src="BBM-Tone-Notification.mp3"
+      preload="auto"
+    ></audio>
+    </body>
 </html>
