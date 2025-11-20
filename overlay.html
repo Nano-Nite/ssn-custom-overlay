@@ -70,7 +70,7 @@
 <div id="chat"></div>
 
 <script>
-const MAX_MESSAGES = 2;
+const MAX_MESSAGES = 1;
 const chat = document.getElementById("chat");
 
 document.addEventListener("click", () => {
@@ -115,12 +115,12 @@ function addMessage(d){
     requestAnimationFrame(()=>div.classList.add("visible"));
 
     // fade out after 25s
-    // setTimeout(()=>div.classList.add("fade-out"), 25000);
+    setTimeout(()=>div.classList.add("fade-out"), 10000);
 
     // remove after fade (33s)
-    // setTimeout(()=>{
-    //     if(div.parentNode) div.parentNode.removeChild(div);
-    // }, 33000);
+    setTimeout(()=>{
+        if(div.parentNode) div.parentNode.removeChild(div);
+    }, 15000);
 
     // Keep message count small
     const msgs = chat.querySelectorAll(".msg");
