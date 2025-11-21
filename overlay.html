@@ -57,13 +57,13 @@
         opacity: 0;
         transform: translateY(20px);
         transition: 0.45s ease;
-        width: fit-content;
-        max-width: 320px;
+        width: 264px;
+        max-width: 264px;
         position: relative;
       }
 
       .msg.right {
-        flex-direction: row-reverse;
+        /* flex-direction: row-reverse; */
         margin-right: 0;
         margin-left: auto;
         text-align: right; /* optional, keeps text aligned like chat apps */
@@ -79,9 +79,10 @@
         opacity: 0;
         transform: translateY(20px);
         transition: 0.45s ease;
-        width: fit-content;
-        max-width: 320px;
+        width: 264px;
+        max-width: 264px;
         position: relative;
+        align-items: flex-end;
       }
 
       .msg.left::after {
@@ -169,6 +170,31 @@
         margin-top: 6px;
         text-align: left;
       }
+
+      .msg-content.left {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: flex-start;
+      }
+
+      .msg-content.right {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: flex-end;
+      }
+
+      .message-body {
+        max-width: 240px; /* prevents reaction payload from breaking layout */
+      }
+
+      .time {
+        font-size: 0.72em;
+        color: #777;
+        margin-top: 4px;
+        width: 100%;
+      }
     </style>
   </head>
 
@@ -239,41 +265,53 @@
         });
 
         if (count === 0) {
-          const avatar = `
-              <div class="avatar right"
-                  style="background-image:url('${avatarURL}')"
-                  onerror="this.style.backgroundImage='url(${defaultAvatar})'">
-              </div>
-          `;
+          div.classList.add("right");
 
           div.innerHTML = `
-              <div class="row">
-                  <div>
-                      <div class="name">${d.chatname || ""}</div>
-                      <div class="text">${d.chatmessage || ""}</div>
-                      <div class="time right">${timeStr}</div>
+              <div class="msg-content right">
+                  <div class="row">
+                      <div class="message-body">
+                          <div class="name">${d.chatname || ""}</div>
+                          <div class="text" style="display: flex;flex-direction: row-reverse;">${
+                            d.chatmessage.toLowerCase() === "p"
+                              ? `<img src="assets/icon/ping.png" alt="PING!!!" style="margin-left:6px;width:15px;height:15px"><b style="color:red">PING!!!</b>`
+                              : `<img src="assets/icon/read.png" alt="READ" style="width: 15px;height: 15px;margin-left: 6px;"><div style="margin-left:0">` +
+                                  (d.chatmessage.length === 0 ? `<div style="font-style: italic;">is sending you a message...</div>` : d.chatmessage) +
+                                  `</div>` || ""
+                          }</div>
+                      </div>
+                      <div class="avatar right"
+                        style="background-image:url('${avatarURL}')"
+                        onerror="this.style.backgroundImage='url(${defaultAvatar})'">
+                      </div>
                   </div>
-                  ${avatar}
+                  <div class="time right">${timeStr}</div>
               </div>
           `;
         } else {
-          const avatar = `
-              <div class="avatar left"
-                  style="background-image:url('${avatarURL}')"
-                  onerror="this.style.backgroundImage='url(${defaultAvatar})'">
-              </div>
-          `;
+          div.classList.add("left");
 
           div.innerHTML = `
-              <div class="row">
-                  ${avatar}
-                  <div>
-                      <div class="name">${d.chatname || ""}</div>
-                      <div class="text">${d.chatmessage || ""}</div>
-                      <div class="time left">${timeStr}</div>
-                  </div>
-              </div>
-          `;
+            <div class="msg-content left">
+                <div class="row">
+                    <div class="avatar left"
+                      style="background-image:url('${avatarURL}')"
+                      onerror="this.style.backgroundImage='url(${defaultAvatar})'">
+                    </div>
+                    <div class="message-body">
+                        <div class="name">${d.chatname || ""}</div>
+                        <div class="text">${
+                          d.chatmessage.toLowerCase() === "p"
+                            ? `<img src="assets/icon/ping.png" alt="PING!!!" style="position:absolute;width:15px;height:15px"><b style="color:red;margin-left:20px">PING!!!</b>`
+                            : `<img src="assets/icon/read.png" alt="READ" style="position:absolute;width:15px;height:15px"><div style="margin-left:20px">` +
+                                (d.chatmessage.length === 0 ? `<div style="font-style: italic;">is sending you a message...</div>` : d.chatmessage) +
+                                `</div>` || ""
+                        }</div>
+                    </div>
+                </div>
+                <div class="time left">${timeStr}</div>
+            </div>
+        `;
         }
 
         chat.appendChild(div);
@@ -282,12 +320,12 @@
         requestAnimationFrame(() => div.classList.add("visible"));
 
         // fade out after 10s
-        setTimeout(()=>div.classList.add("fade-out"), 10000);
+        // setTimeout(()=>div.classList.add("fade-out"), 10000);
 
         // remove after fade (15s)
-        setTimeout(()=>{
-            if(div.parentNode) div.parentNode.removeChild(div);
-        }, 15000);
+        // setTimeout(()=>{
+        //     if(div.parentNode) div.parentNode.removeChild(div);
+        // }, 15000);
 
         messageQueue.push(div);
 
@@ -333,8 +371,8 @@
     </script>
     <audio
       id="notifSound"
-      src="BBM-Tone-Notification.mp3"
+      src="assets/sound/BBM-Tone-Notification.mp3"
       preload="auto"
     ></audio>
-    </body>
+  </body>
 </html>
