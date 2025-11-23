@@ -320,12 +320,12 @@
         requestAnimationFrame(() => div.classList.add("visible"));
 
         // fade out after 10s
-        // setTimeout(()=>div.classList.add("fade-out"), 10000);
+        setTimeout(()=>div.classList.add("fade-out"), 10000);
 
         // remove after fade (15s)
-        // setTimeout(()=>{
-        //     if(div.parentNode) div.parentNode.removeChild(div);
-        // }, 15000);
+        setTimeout(()=>{
+            if(div.parentNode) div.parentNode.removeChild(div);
+        }, 15000);
 
         messageQueue.push(div);
 
